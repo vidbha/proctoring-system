@@ -13,13 +13,12 @@ app.use(express.json());
 
 // --- API Routes ---
 
-// New proctoring session
+// Start a new proctoring session
 app.post('/api/sessions', async (req, res) => {
   try {
     const { candidateName } = req.body;
-    if (!candidateName) {
-      return res.status(400).json({ error: 'Candidate name is required.' });
-    }
+    if (!candidateName) return res.status(400).json({ error: 'Candidate name is required.' });
+    
     const newSession = await ProctoringSession.create({ candidateName });
     res.status(201).json(newSession);
   } catch (error) {
@@ -28,21 +27,17 @@ app.post('/api/sessions', async (req, res) => {
   }
 });
 
-// Logging a new event for a session
+// Log a new event
 app.post('/api/events', async (req, res) => {
   try {
     const { sessionId, eventType, message, deduction } = req.body;
-
     const session = await ProctoringSession.findByPk(sessionId);
-    if (!session) {
-      return res.status(404).json({ error: 'Session not found.' });
-    }
+    if (!session) return res.status(404).json({ error: 'Session not found.' });
 
     session.finalIntegrityScore = Math.max(0, session.finalIntegrityScore - deduction);
     await session.save();
 
     const newEvent = await EventLog.create({ sessionId, eventType, message, deduction });
-
     res.status(201).json({ newEvent, updatedScore: session.finalIntegrityScore });
   } catch (error) {
     console.error('Error logging event:', error);
@@ -54,13 +49,13 @@ app.post('/api/events', async (req, res) => {
 app.get('/api/sessions/:id', async (req, res) => {
   try {
     const session = await ProctoringSession.findByPk(req.params.id, {
-      include: { model: EventLog, as: 'events' },
-      order: [[{ model: EventLog, as: 'events' }, 'id', 'ASC']]
+      include: {
+        model: EventLog,
+        as: 'events',
+        order: [['id', 'ASC']],
+      },
     });
-
-    if (!session) {
-      return res.status(404).json({ error: 'Session report not found.' });
-    }
+    if (!session) return res.status(404).json({ error: 'Session report not found.' });
     res.json(session);
   } catch (error) {
     console.error('Error fetching report:', error);
@@ -72,9 +67,8 @@ app.get('/api/sessions/:id', async (req, res) => {
 app.put('/api/sessions/:id/end', async (req, res) => {
   try {
     const session = await ProctoringSession.findByPk(req.params.id);
-    if (!session) {
-      return res.status(404).json({ error: 'Session not found.' });
-    }
+    if (!session) return res.status(404).json({ error: 'Session not found.' });
+
     session.endTime = new Date();
     await session.save();
     res.json(session);
@@ -84,19 +78,21 @@ app.put('/api/sessions/:id/end', async (req, res) => {
   }
 });
 
+// --- Serve React frontend in production ---
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-// Serve React frontend build in production
-if (process.env.NODE_ENV === "production") {
-  app.use(express.static(path.join(__dirname, "../frontend/build")));
+if (process.env.NODE_ENV === 'production') {
+  // Path to React build
+  const frontendBuildPath = path.join(__dirname, 'frontend');
+  app.use(express.static(frontendBuildPath));
 
-  app.get("*", (req, res) => {
-    res.sendFile(path.join(__dirname, "../frontend/build/index.html"));
+  app.get('*', (req, res) => {
+    res.sendFile(path.join(frontendBuildPath, 'index.html'));
   });
 }
 
-// Start logic of server
+// --- Start Server ---
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, async () => {
   console.log(`Server running on port ${PORT}`);

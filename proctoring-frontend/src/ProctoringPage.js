@@ -5,7 +5,7 @@ import LogPanel from './components/LogPanel';
 import ReportPage from './components/ReportPage';
 import AlertToast from './components/AlertToast';
 
-const API_BASE_URL = '/api';
+const API_BASE_URL = process.env.REACT_APP_API_URL || '/api';
 
 function ProctoringPage() {
     const [sessionId, setSessionId] = useState(null);

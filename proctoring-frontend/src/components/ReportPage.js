@@ -4,7 +4,7 @@ import axios from 'axios';
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
 
-const API_BASE_URL = '/api';
+const API_BASE_URL = process.env.REACT_APP_API_URL || '/api';
 
 function ReportPage({ sessionId, onRestart, videoBlob }) {
     const [report, setReport] = useState(null);
