@@ -9,22 +9,22 @@ const API_BASE_URL = process.env.REACT_APP_API_URL || '/api';
 
 function ProctoringPage() {
  const [sessionId, setSessionId] = useState(null);
-    const [logs, setLogs] = useState([]);
-    const [integrityScore, setIntegrityScore] = useState(100);
-    const [view, setView] = useState('idle');
-    const [recordedVideoBlob, setRecordedVideoBlob] = useState(null);
-    const [alert, setAlert] = useState({ show: false, message: '' });
+    const [logs, setLogs] = useState([]);
+    const [integrityScore, setIntegrityScore] = useState(100);
+    const [view, setView] = useState('idle');
+    const [recordedVideoBlob, setRecordedVideoBlob] = useState(null);
+    const [alert, setAlert] = useState({ show: false, message: '' });
 
-    const startSession = async () => {
-        const candidateName = prompt("Please enter candidate's name:", "John Doe");
-        if (!candidateName) return;
-        try {
-            const response = await axios.post(`${API_BASE_URL}/sessions`, { candidateName });
-            setSessionId(response.data.id);
-            setLogs([]);
-            setIntegrityScore(100);
-            setRecordedVideoBlob(null);
-            setView('proctoring');
+    const startSession = async () => {
+    const candidateName = prompt("Please enter candidate's name:", "John Doe");
+    if (!candidateName) return;
+    try {
+     const response = await axios.post(`${API_BASE_URL}/sessions`, { candidateName });
+        setSessionId(response.data.id);
+        setLogs([]);
+        setIntegrityScore(100);
+        setRecordedVideoBlob(null);
+        setView('proctoring');
             logEventToPanel({ message: `Session started for ${candidateName}.` });
         } catch (error) {
             console.error("Failed to start session", error);
@@ -121,7 +121,7 @@ function ProctoringPage() {
             <AlertToast 
                 message={alert.message}
                 show={alert.show}
-                onClose={() => setAlert({ show: false, message: '' })}
+               onClose={() => setAlert({ show: false, message: '' })}
             />
         </div>
     );

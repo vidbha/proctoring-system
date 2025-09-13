@@ -1,70 +1,117 @@
-# Getting Started with Create React App
+# AI-Powered Video Proctoring System 📹
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+![Status](https://img.shields.io/badge/status-active-success.svg)
 
-## Available Scripts
+An intelligent video proctoring system designed to monitor and ensure the integrity of online interviews or assessments. It uses real-time computer vision to detect candidate focus, flag unauthorized items, and generate a final integrity report.
 
-In the project directory, you can run:
+## Core Features ✨
 
-### `npm start`
+* **👁️ Focus & Gaze Tracking:** Detects if the candidate is looking away from the screen or is absent from the frame for an extended period.
+* **🧍 Face Detection:** Ensures only one person is present and that the candidate's face is always visible.
+* **📱 Object Detection:** Identifies unauthorized items like mobile phones, books, and other electronic devices using a pre-trained model.
+* **📊 Real-time Event Logging:** Flags and logs all suspicious events with timestamps and associated integrity score deductions.
+* **📈 Automated Reporting:** Generates a comprehensive PDF report at the end of each session, detailing all events and providing a final integrity score.
+* **☁️ Cloud-Ready:** Includes a GitHub Actions workflow for seamless deployment to Microsoft Azure.
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+---
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+## Tech Stack 🛠️
 
-### `npm test`
+#### Frontend:
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+* **React.js:** For building the user interface.
+* **TensorFlow.js (COCO-SSD):** For real-time object detection in the browser.
+* **MediaPipe (Face Mesh):** For high-fidelity face and gaze detection.
+* **Axios:** For communicating with the backend API.
+* **jsPDF & jspdf-autotable:** For generating PDF reports on the client-side.
+* **Tailwind CSS:** For styling the user interface.
 
-### `npm run build`
+#### Backend:
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+* **Node.js & Express.js:** For the REST API and server logic.
+* **Sequelize ORM:** To interact with the SQL database.
+* **Azure SQL Database:** As the production database for storing session and event data.
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+---
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+## Installation & Setup ⚙️
 
-### `npm run eject`
+Follow these steps to get the project running on your local machine.
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
+### Prerequisites
 
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+* **Node.js & npm:** Make sure you have Node.js (version 18.x or higher) and npm installed.
+* **Git:** To clone the repository.
+* **SQL Database:** A running instance of SQL Server, PostgreSQL, or another Sequelize-compatible database for local development.
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
+### 1. Backend Setup
 
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
+First, clone the repository and set up the backend server.
 
-## Learn More
+```bash
+# Clone the project from GitHub
+git clone <your-repository-url>
+cd proctoring-backend
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+# Install dependencies
+npm install
+```
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+Next, create a .env file in the proctoring-backend directory to store your database connection details.
 
-### Code Splitting
+.env file example:
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
+```bash
+# Your SQL Server Connection String
+# Replace with your actual database credentials and details
+DB_CONNECTION_STRING="mssql://username:password@localhost:1433/database_name"
 
-### Analyzing the Bundle Size
+# The port for the server to run on
+PORT=5000
+```
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
+### 2. Frontend Setup
 
-### Making a Progressive Web App
+In a new terminal, navigate to the frontend directory and install its dependencies.
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
+```bash
+# Navigate to the frontend directory from the project root
+cd ../proctoring-frontend
 
-### Advanced Configuration
+# Install dependencies
+npm install
+```
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
+## Usage 🚀
 
-### Deployment
+To run the application, you need to start both the backend and frontend servers.
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
+### 1. Start the Backend Server
 
-### `npm run build` fails to minify
+In your first terminal, inside the proctoring-backend directory:
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+```bash
+npm start
+```
+
+You should see a confirmation message that the server is running on port 5000 and has successfully connected to the database.
+
+### 2. Start the Frontend Application
+
+In your second terminal, inside the proctoring-frontend directory:
+
+```bash
+npm start
+```
+
+This will automatically open the application in your default web browser at http://localhost:3000.
+
+### 3. Run a Proctoring Session
+
+The application will open on the "Start New Session" screen.
+
+* Click the button and enter the candidate's name when prompted.
+* The proctoring session will begin. The video feed will be analyzed in real-time.
+* Any suspicious events (looking away, phone detected, etc.) will appear in the "Event Log" on the right.
+* When the interview is complete, click the "Stop Proctoring & Generate Report" button.
+* You will be taken to the Report Page, which summarizes the session and allows you to download a PDF report and the session video recording.

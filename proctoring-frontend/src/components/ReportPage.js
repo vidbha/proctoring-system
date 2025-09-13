@@ -11,7 +11,7 @@ function ReportPage({ sessionId, onRestart, videoBlob }) {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
 
-    // --- FIX 1: Use useMemo to create a stable URL ---
+  
     // This ensures the URL doesn't change on every re-render, breaking the loop.
     const videoUrl = useMemo(() => {
         return videoBlob ? URL.createObjectURL(videoBlob) : null;
