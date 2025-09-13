@@ -110,28 +110,21 @@ function ProctoringPage() {
         }
     };
 
-return (
-    <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* --- Left Side: Video Feed (takes up 2/3 of the screen on large displays) --- */}
-        <div className="lg:col-span-2">
-            <VideoFeed 
-                onEvent={handleDetectionEvent} 
-                isProctoring={view === 'proctoring'}
-                onRecordingComplete={handleRecordingComplete} 
-            />
-            <div className="mt-4 flex justify-center">
-                <button onClick={stopSession} className="px-8 py-3 bg-red-600 text-white font-semibold rounded-lg shadow-md hover:bg-red-700">
-                    Stop Proctoring & Generate Report
-                </button>
-            </div>
-        </div>
-
-        {/* --- Right Side: Log Panel (takes up 1/3 of the screen) --- */}
-        <div className="lg:col-span-1">
-            <LogPanel logs={logs} score={integrityScore} />
-        </div>
-    </div>
-);
+    return (
+        <div className="container mx-auto p-4 md:p-8 font-sans">
+            <header className="text-center mb-8">
+                <h1 className="text-4xl font-bold">Proctoring Dashboard</h1>
+            </header>
+            <main>
+                {renderContent()}
+            </main>
+            <AlertToast 
+                message={alert.message}
+                show={alert.show}
+               onClose={() => setAlert({ show: false, message: '' })}
+            />
+        </div>
+    );
 }
 
 export default ProctoringPage;
