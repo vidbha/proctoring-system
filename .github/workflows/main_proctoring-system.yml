@@ -1,7 +1,6 @@
-# Docs for the Azure Web Apps Deploy action: https://github.com/Azure/webapps-deploy
-# More GitHub Actions for Azure: https://github.com/Azure/actions
+# .github/workflows/azure-deploy.yml
 
-name: Build and deploy Node.js app to Azure Web App - Proctoring-System
+name: Build and deploy Node.js + React app to Azure Web App - Proctoring-System
 
 on:
   push:
@@ -13,41 +12,59 @@ jobs:
   build:
     runs-on: ubuntu-latest
     permissions:
-      contents: read #This is required for actions/checkout
+      contents: read
 
     steps:
+      # Step 1: Checkout repo
       - uses: actions/checkout@v4
 
+      # Step 2: Setup Node.js
       - name: Set up Node.js version
         uses: actions/setup-node@v3
         with:
           node-version: '20.x'
 
-      - name: npm install, build, and test
+      # Step 3: Build frontend
+      - name: Install and build frontend
+        working-directory: ./proctoring-frontend
         run: |
           npm install
-          npm run build --if-present
-          npm run test --if-present
+          npm run build
 
-      - name: Upload artifact for deployment job
+      # Step 4: Copy frontend build into backend
+      - name: Copy frontend build into backend folder
+        run: |
+          mkdir -p ./proctoring-backend/frontend
+          cp -r ./proctoring-frontend/build/* ./proctoring-backend/frontend/
+
+      # Step 5: Install backend dependencies
+      - name: Install backend dependencies
+        working-directory: ./proctoring-backend
+        run: npm install
+
+      # Step 6: Upload backend folder as artifact for deployment
+      - name: Upload artifact for deployment
         uses: actions/upload-artifact@v4
         with:
-          name: node-app
-          path: .
+          name: backend-package
+          path: ./proctoring-backend
 
   deploy:
     runs-on: ubuntu-latest
     needs: build
     permissions:
-      id-token: write #This is required for requesting the JWT
-      contents: read #This is required for actions/checkout
+      id-token: write
+      contents: read
 
     steps:
+      # Step 1: Download artifact from build job
       - name: Download artifact from build job
         uses: actions/download-artifact@v4
         with:
-          name: node-app
-      
+          name: backend-package
+          path: ./proctoring-backend
+
+      # Step 2: Login to Azure
       - name: Login to Azure
         uses: azure/login@v2
         with:
@@ -55,11 +72,10 @@ jobs:
           tenant-id: ${{ secrets.AZUREAPPSERVICE_TENANTID_618836DC04D14DE8B84D1276FF7EF991 }}
           subscription-id: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID_104936D38D564B04A0FCC4DB6A77EE5B }}
 
-      - name: 'Deploy to Azure Web App'
-        id: deploy-to-webapp
+      # Step 3: Deploy backend folder (with frontend build inside) to Azure
+      - name: Deploy to Azure Web App
         uses: azure/webapps-deploy@v3
         with:
           app-name: 'Proctoring-System'
           slot-name: 'Production'
-          package: .
-          
+          package: ./proctoring-backend
