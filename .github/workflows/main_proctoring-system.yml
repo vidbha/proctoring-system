@@ -1,0 +1,81 @@
+# .github/workflows/azure-deploy.yml
+
+name: Build and deploy Node.js + React app to Azure Web App - Proctoring-System
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+
+    steps:
+      # Step 1: Checkout repo
+      - uses: actions/checkout@v4
+
+      # Step 2: Setup Node.js
+      - name: Set up Node.js version
+        uses: actions/setup-node@v3
+        with:
+          node-version: '20.x'
+
+      # Step 3: Build frontend
+      - name: Install and build frontend
+        working-directory: ./proctoring-frontend
+        run: |
+          npm install
+          npm run build
+
+      # Step 4: Copy frontend build into backend
+      - name: Copy frontend build into backend folder
+        run: |
+          mkdir -p ./proctoring-backend/frontend
+          cp -r ./proctoring-frontend/build/* ./proctoring-backend/frontend/
+
+      # Step 5: Install backend dependencies
+      - name: Install backend dependencies
+        working-directory: ./proctoring-backend
+        run: npm install
+
+      # Step 6: Upload backend folder as artifact for deployment
+      - name: Upload artifact for deployment
+        uses: actions/upload-artifact@v4
+        with:
+          name: backend-package
+          path: ./proctoring-backend
+
+  deploy:
+    runs-on: ubuntu-latest
+    needs: build
+    permissions:
+      id-token: write
+      contents: read
+
+    steps:
+      # Step 1: Download artifact from build job
+      - name: Download artifact from build job
+        uses: actions/download-artifact@v4
+        with:
+          name: backend-package
+          path: ./proctoring-backend
+
+      # Step 2: Login to Azure
+      - name: Login to Azure
+        uses: azure/login@v2
+        with:
+          client-id: ${{ secrets.AZUREAPPSERVICE_CLIENTID_03B3B7B56CA7404BBB673BF885C5F50B }}
+          tenant-id: ${{ secrets.AZUREAPPSERVICE_TENANTID_618836DC04D14DE8B84D1276FF7EF991 }}
+          subscription-id: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID_104936D38D564B04A0FCC4DB6A77EE5B }}
+
+      # Step 3: Deploy backend folder (with frontend build inside) to Azure
+      - name: Deploy to Azure Web App
+        uses: azure/webapps-deploy@v3
+        with:
+          app-name: 'Proctoring-System'
+          slot-name: 'Production'
+          package: ./proctoring-backend
