@@ -12,6 +12,7 @@ An intelligent video proctoring system designed to monitor and ensure the integr
 * **📊 Real-time Event Logging:** Flags and logs all suspicious events with timestamps and associated integrity score deductions.
 * **📈 Automated Reporting:** Generates a comprehensive PDF report at the end of each session, detailing all events and providing a final integrity score.
 * **☁️ Cloud-Ready:** Includes a GitHub Actions workflow for seamless deployment to Microsoft Azure.
+**Live Demo:** [https://proctoring-system-a5a3b9b9h0fxf4dz.centralindia-01.azurewebsites.net/](https://proctoring-system-a5a3b9b9h0fxf4dz.centralindia-01.azurewebsites.net/)
 
 ---
 
