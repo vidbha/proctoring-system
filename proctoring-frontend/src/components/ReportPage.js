@@ -12,7 +12,7 @@ function ReportPage({ sessionId, onRestart, videoBlob }) {
     const [error, setError] = useState(null);
 
   
-    // This ensures the URL doesn't change on every re-render, breaking the loop.
+    // ensures the URL doesn't change on every re-render, breaking the loop.
     const videoUrl = useMemo(() => {
         return videoBlob ? URL.createObjectURL(videoBlob) : null;
     }, [videoBlob]);
@@ -33,16 +33,15 @@ function ReportPage({ sessionId, onRestart, videoBlob }) {
         };
         fetchReport();
 
-        // --- FIX 2: Correctly handle cleanup ---
-        // This cleanup function now runs only when the component unmounts or the URL changes,
+       //function runs only when the component unmounts or the URL changes,
         // preventing memory leaks without causing re-renders.
         return () => {
             if (videoUrl) {
                 URL.revokeObjectURL(videoUrl);
             }
         };
-    // --- CHANGED: The dependency array now uses the stable videoUrl ---
-    }, [sessionId]); // We can remove videoUrl from dependencies as it's stable and tied to videoBlob
+    // The dependency array uses the stable videoUrl ---
+    }, [sessionId]); 
 
     const calculateDuration = (start, end) => {
         if (!start || !end) return 'N/A';

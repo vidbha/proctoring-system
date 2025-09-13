@@ -4,7 +4,7 @@ import '@tensorflow/tfjs-backend-cpu';
 import * as cocoSsd from '@tensorflow-models/coco-ssd';
 import { FaceMesh } from '@mediapipe/face_mesh';
 
-// All event types and thresholds remain the same
+
 const EVENTS = {
     NO_FACE: { eventType: 'no_face', message: 'Candidate not in frame for >10s', deduction: 5 },
     MULTIPLE_FACES: { eventType: 'multiple_faces', message: 'Multiple faces detected', deduction: 10 },
@@ -27,7 +27,7 @@ const OBJECT_CONFIDENCE_THRESHOLD = 0.60;
 function VideoFeed({ onEvent, isProctoring, onRecordingComplete }) {
     const videoRef = useRef(null);
     const canvasRef = useRef(null);
-    // FIX 1: Add a ref for the volume bar element
+    // ref for the volume bar element
     const volumeBarRef = useRef(null);
     const [models, setModels] = useState(null);
     const [isLoading, setIsLoading] = useState(true);
@@ -154,7 +154,7 @@ function VideoFeed({ onEvent, isProctoring, onRecordingComplete }) {
             });
         };
 
-        // FIX 1: Create a function to update the volume bar UI
+        // a function to update the volume bar UI
         const updateVolumeBar = () => {
             if (!analyserRef.current || !volumeBarRef.current) return;
             const dataArray = new Uint8Array(analyserRef.current.frequencyBinCount);
@@ -176,7 +176,7 @@ function VideoFeed({ onEvent, isProctoring, onRecordingComplete }) {
         models.faceMesh.onResults(processFaceResults);
 
         const detectionLoop = async () => {
-            // FIX 2: Add robustness checks for the video stream
+            //  robustness checks for the video stream
             if (!videoRef.current || !videoRef.current.srcObject || videoRef.current.paused || videoRef.current.ended) {
                 animationFrameId.current = requestAnimationFrame(detectionLoop);
                 return;
@@ -188,7 +188,7 @@ function VideoFeed({ onEvent, isProctoring, onRecordingComplete }) {
             if (now - lastDetectionTime.current > 400) {
                 lastDetectionTime.current = now;
                 
-                // FIX 2: Wrap AI predictions in a try/catch to prevent crashes
+                // Wrap AI predictions in a try/catch to prevent crashes
                 try {
                     await models.faceMesh.send({ image: video });
                     const objectPredictions = await models.objectModel.detect(video);
@@ -199,7 +199,7 @@ function VideoFeed({ onEvent, isProctoring, onRecordingComplete }) {
                 }
             }
             
-            // FIX 1: Call the volume bar update function on each frame
+            // Call the volume bar update function on each frame
             updateVolumeBar();
             animationFrameId.current = requestAnimationFrame(detectionLoop);
         };
@@ -267,7 +267,7 @@ function VideoFeed({ onEvent, isProctoring, onRecordingComplete }) {
         <div className="relative w-full max-w-4xl mx-auto bg-gray-900 rounded-lg shadow-lg">
             {isLoading && (<div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-75 text-white z-20"><p className="text-xl">Loading AI Models...</p></div>)}
             <div className="absolute top-2 left-2 w-24 h-6 bg-gray-800 rounded-full border border-gray-600 overflow-hidden z-10">
-                {/* FIX 1: Attach the ref to the div */}
+                {/* Attach the ref to the div */}
                 <div ref={volumeBarRef} className="h-full bg-green-500 transition-all duration-100" style={{ width: '0%' }}></div>
             </div>
             <video ref={videoRef} style={{ display: 'none' }} autoPlay playsInline muted />

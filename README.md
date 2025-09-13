@@ -6,12 +6,12 @@ An intelligent video proctoring system designed to monitor and ensure the integr
 
 ## Core Features ✨
 
-* **👁️ Focus & Gaze Tracking:** Detects if the candidate is looking away from the screen or is absent from the frame for an extended period.
-* **🧍 Face Detection:** Ensures only one person is present and that the candidate's face is always visible.
-* **📱 Object Detection:** Identifies unauthorized items like mobile phones, books, and other electronic devices using a pre-trained model.
-* **📊 Real-time Event Logging:** Flags and logs all suspicious events with timestamps and associated integrity score deductions.
-* **📈 Automated Reporting:** Generates a comprehensive PDF report at the end of each session, detailing all events and providing a final integrity score.
-* **☁️ Cloud-Ready:** Includes a GitHub Actions workflow for seamless deployment to Microsoft Azure.
+* ** Focus & Gaze Tracking:** Detects if the candidate is looking away from the screen or is absent from the frame for an extended period.
+* ** Face Detection:** Ensures only one person is present and that the candidate's face is always visible.
+* **Object Detection:** Identifies unauthorized items like mobile phones, books, and other electronic devices using a pre-trained model.
+* **Real-time Event Logging:** Flags and logs all suspicious events with timestamps and associated integrity score deductions.
+* ** Automated Reporting:** Generates a comprehensive PDF report at the end of each session, detailing all events and providing a final integrity score.
+* ** Cloud-Ready:** Includes a GitHub Actions workflow for seamless deployment to Microsoft Azure.
 ---
 ## Live Demo
  [https://proctoring-system-a5a3b9b9h0fxf4dz.centralindia-01.azurewebsites.net/](https://proctoring-system-a5a3b9b9h0fxf4dz.centralindia-01.azurewebsites.net/)
