@@ -29,7 +29,7 @@ function ReportPage({ sessionId, onRestart, videoBlob }) {
         };
         fetchReport();
         return () => { if (videoUrl) { URL.revokeObjectURL(videoUrl); } };
-    }, [sessionId]);
+    }, [sessionId,videoUrl]);
 
     const calculateDuration = (start, end) => {
         if (!start || !end) return 'N/A';
