@@ -1,0 +1,16 @@
+
+/* code box styling (simple, no header or copy button) */
+.codebox pre {
+  background: rgba(10, 18, 40, 0.6);
+  color: #e6eef8;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, "Roboto Mono", "Source Code Pro", monospace;
+  font-size: 13px;
+  line-height: 1.5;
+  border-radius: 8px;
+  border: 1px solid rgba(255,255,255,0.04);
+}
+
+/* keep existing scrollbar theming for inner panes */
+.custom-scrollbar::-webkit-scrollbar { width: 8px; }
+.custom-scrollbar::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.12); border-radius: 999px; }
+.custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
