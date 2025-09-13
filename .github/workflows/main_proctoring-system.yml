@@ -31,18 +31,26 @@ jobs:
           npm install
           npm run build
 
-      # Step 4: Copy frontend build into backend
+      # Step 4: Verify React build exists
+      - name: Verify React build output
+        run: |
+          if [ ! -f "./proctoring-frontend/build/index.html" ]; then
+            echo "❌ React build failed — index.html missing"
+            exit 1
+          fi
+
+      # Step 5: Copy frontend build into backend
       - name: Copy frontend build into backend folder
         run: |
           mkdir -p ./proctoring-backend/frontend
           cp -r ./proctoring-frontend/build/* ./proctoring-backend/frontend/
 
-      # Step 5: Install backend dependencies
+      # Step 6: Install backend dependencies
       - name: Install backend dependencies
         working-directory: ./proctoring-backend
         run: npm install
 
-      # Step 6: Upload backend folder as artifact for deployment
+      # Step 7: Upload backend folder as artifact for deployment
       - name: Upload artifact for deployment
         uses: actions/upload-artifact@v4
         with:
@@ -79,3 +87,16 @@ jobs:
           app-name: 'Proctoring-System'
           slot-name: 'Production'
           package: ./proctoring-backend
+          app-settings-json: |
+            [
+              {
+                "name": "NODE_ENV",
+                "value": "production",
+                "slotSetting": false
+              },
+              {
+                "name": "PORT",
+                "value": "8080",
+                "slotSetting": false
+              }
+            ]
