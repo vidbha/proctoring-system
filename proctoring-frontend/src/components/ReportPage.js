@@ -1,17 +1,21 @@
-import React, { useState, useEffect } from 'react';
+// --- UPDATED: Add useMemo to the import ---
+import React, { useState, useEffect, useMemo } from 'react';
 import axios from 'axios';
-// --- UPDATED: Import the libraries correctly ---
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
 
-const API_BASE_URL = process.env.REACT_APP_API_URL || '/api';
+const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000/api';
 
 function ReportPage({ sessionId, onRestart, videoBlob }) {
     const [report, setReport] = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
 
-    const videoUrl = videoBlob ? URL.createObjectURL(videoBlob) : null;
+    // --- FIX 1: Use useMemo to create a stable URL ---
+    // This ensures the URL doesn't change on every re-render, breaking the loop.
+    const videoUrl = useMemo(() => {
+        return videoBlob ? URL.createObjectURL(videoBlob) : null;
+    }, [videoBlob]);
 
     useEffect(() => {
         if (!sessionId) return;
@@ -28,8 +32,17 @@ function ReportPage({ sessionId, onRestart, videoBlob }) {
             }
         };
         fetchReport();
-        return () => { if (videoUrl) { URL.revokeObjectURL(videoUrl); } };
-    }, [sessionId,videoUrl]);
+
+        // --- FIX 2: Correctly handle cleanup ---
+        // This cleanup function now runs only when the component unmounts or the URL changes,
+        // preventing memory leaks without causing re-renders.
+        return () => {
+            if (videoUrl) {
+                URL.revokeObjectURL(videoUrl);
+            }
+        };
+    // --- CHANGED: The dependency array now uses the stable videoUrl ---
+    }, [sessionId]); // We can remove videoUrl from dependencies as it's stable and tied to videoBlob
 
     const calculateDuration = (start, end) => {
         if (!start || !end) return 'N/A';
@@ -71,8 +84,6 @@ function ReportPage({ sessionId, onRestart, videoBlob }) {
         doc.setFontSize(16);
         doc.text(`Final Integrity Score: ${report.finalIntegrityScore}`, 14, 70);
 
-        // --- THE FIX IS HERE ---
-        // We now call autoTable as a function, passing the doc object to it.
         autoTable(doc, {
             head: [tableColumn],
             body: tableRows,
@@ -90,7 +101,7 @@ function ReportPage({ sessionId, onRestart, videoBlob }) {
         <div className="bg-white p-6 rounded-lg shadow-lg animate-fade-in max-w-4xl mx-auto">
             <div className="flex justify-between items-center border-b pb-3 mb-4">
                 <h1 className="text-3xl font-bold">Proctoring Report</h1>
-                <button 
+                <button  
                     onClick={generatePdfReport}
                     className="px-4 py-2 bg-gray-700 text-white font-semibold rounded-lg shadow-md hover:bg-gray-800"
                 >
