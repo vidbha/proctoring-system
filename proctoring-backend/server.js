@@ -99,7 +99,7 @@ app.listen(PORT, async () => {
   try {
     await sequelize.authenticate();
     console.log('Azure SQL database connected successfully.');
-    await sequelize.sync({ alter: true });
+    await sequelize.sync({ force: true });
     console.log('Database synchronized.');
   } catch (error) {
     console.error('Unable to connect to the database:', error);
