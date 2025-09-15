@@ -13,6 +13,19 @@ app.use(express.json());
 
 // --- API Routes ---
 
+// Health check endpoint to verify database connectivity
+app.get('/api/health', async (req, res) => {
+  try {
+    // Perform a simple, fast query to ensure the database is truly ready.
+    await sequelize.query('SELECT 1');
+    res.status(200).json({ status: 'ok', database: 'connected' });
+  } catch (error) {
+    // If the query fails, it means the DB is not ready.
+    console.error('Health check failed, database not ready:', error.message);
+    res.status(503).json({ status: 'error', database: 'connecting' });
+  }
+});
+
 // Start a new proctoring session
 app.post('/api/sessions', async (req, res) => {
   try {
@@ -67,7 +80,7 @@ app.get('/api/sessions/:id', async (req, res) => {
 app.put('/api/sessions/:id/end', async (req, res) => {
   try {
     const session = await ProctoringSession.findByPk(req.params.id);
-    if (!session) return res.status(404).json({ error: 'Session not found.' });
+    if (!session) return res.status(444).json({ error: 'Session not found.' });
 
     session.endTime = new Date();
     await session.save();
