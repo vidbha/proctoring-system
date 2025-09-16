@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import VideoFeed from './components/VideoFeed';
 import ReportPage from './components/ReportPage';
@@ -33,12 +33,45 @@ function LogPanel({ logs, score }) {
 
 // --- Main Proctoring Page Component ---
 function ProctoringPage() {
+    // --- NEW: State to track the server's detailed status ---
+    const [serverStatus, setServerStatus] = useState('connecting'); // 'connecting', 'db_wait', 'ready'
+    
     const [sessionId, setSessionId] = useState(null);
     const [logs, setLogs] = useState([]);
     const [integrityScore, setIntegrityScore] = useState(100);
     const [view, setView] = useState('idle');
     const [recordedVideoBlob, setRecordedVideoBlob] = useState(null);
     const [alert, setAlert] = useState({ show: false, message: '' });
+
+    // --- NEW: More robust useEffect to poll the health check endpoint ---
+    useEffect(() => {
+        const checkServerStatus = async () => {
+            try {
+                const response = await axios.get('/api/health');
+                if (response.data.database === 'connected') {
+                    setServerStatus('ready');
+                    return true; // Fully ready
+                }
+                // If we get a response but DB is not connected, it's waiting
+                setServerStatus('db_wait');
+
+            } catch (error) {
+                // This catches network errors when the server is down
+                setServerStatus('connecting');
+            }
+            return false; // Not ready yet
+        };
+
+        const intervalId = setInterval(async () => {
+            const isReady = await checkServerStatus();
+            if (isReady) {
+                clearInterval(intervalId);
+            }
+        }, 3000); // Retry every 3 seconds
+
+        // Cleanup interval on component unmount
+        return () => clearInterval(intervalId);
+    }, []);
 
     const startSession = async () => {
         const candidateName = prompt("Please enter candidate's name:", "John Doe");
@@ -96,13 +129,27 @@ function ProctoringPage() {
         setRecordedVideoBlob(blob);
     };
 
+    // --- NEW: If server is not ready, show the loading screen ---
+    if (serverStatus !== 'ready') {
+        return (
+            <div className="flex flex-col items-center justify-center min-h-screen bg-gray-50 text-gray-700 text-center p-4">
+                <h1 className="text-4xl font-bold mb-4">Proctoring Dashboard</h1>
+                <h2 className="text-2xl font-semibold">
+                    {serverStatus === 'connecting' && 'Connecting to Server...'}
+                    {serverStatus === 'db_wait' && 'Waking Up Database...'}
+                </h2>
+                <p className="mt-2 text-gray-500">This may take a moment. Please wait.</p>
+                <div className="mt-4 animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500"></div>
+            </div>
+        );
+    }
+    
+    // --- Otherwise, render the main application ---
     const renderContent = () => {
         switch (view) {
             case 'proctoring':
-                // --- This is the new, better side-by-side layout ---
                 return (
                     <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                        {/* Left Side: Video Feed */}
                         <div className="lg:col-span-2">
                             <VideoFeed 
                                 onEvent={handleDetectionEvent} 
@@ -115,7 +162,6 @@ function ProctoringPage() {
                                 </button>
                             </div>
                         </div>
-                        {/* Right Side: Log Panel */}
                         <div className="lg:col-span-1">
                             <LogPanel logs={logs} score={integrityScore} />
                         </div>
@@ -127,7 +173,7 @@ function ProctoringPage() {
             default:
                 return (
                     <div className="text-center py-20">
-                         <h2 className="text-2xl mb-6">Ready to begin a new proctoring session?</h2>
+                        <h2 className="text-2xl mb-6">Ready to begin a new proctoring session?</h2>
                         <button onClick={startSession} className="px-10 py-4 bg-blue-600 text-white font-bold text-lg rounded-lg shadow-xl hover:bg-blue-700">
                             Start New Session
                         </button>
