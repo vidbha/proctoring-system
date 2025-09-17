@@ -74,7 +74,7 @@ function ProctoringPage() {
     }, []);
 
     const startSession = async () => {
-        const candidateName = prompt("Please enter candidate's name:", "John Doe");
+        const candidateName = prompt("Please enter candidate's name:", "");
         if (!candidateName) return;
         try {
             const response = await axios.post(`/api/sessions`, { candidateName });
